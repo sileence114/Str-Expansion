@@ -175,8 +175,8 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
         return result;
     }
     private static BiFunction<OfflinePlayer, String, Object> handleParamFunc = StrExpansion::handleParam;
-    private static String trueBoolean = "&a⚫";
-    private static String falseBoolean = "&7⚪";
+    private static String trueBoolean = "&a●";
+    private static String falseBoolean = "&7○";
     private static String booleanToStringTrue = "<t>";
     private static String booleanToStringFalse = "<f>";
     @Override
@@ -184,8 +184,8 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
         handleParamFunc = "true".equals(getString("debug", "false")) ?
                           StrExpansion::handleParamDebugged :
                           StrExpansion::handleParam;
-        trueBoolean = getString("boolean.format.true", "&a⚫");
-        falseBoolean = getString("boolean.format.false", "&7⚪");
+        trueBoolean = getString("boolean.format.true", "&a●");
+        falseBoolean = getString("boolean.format.false", "&7○");
         if(!"true".equals(getString("boolean.output-parameter-format", "true"))){
             booleanToStringTrue = trueBoolean;
             booleanToStringFalse = falseBoolean;
@@ -247,7 +247,7 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                     /* %str_indexof_str,subStr% */
                     /* %str_indexof_str,subStr,<fromIndex>% */
                     return Integer.toString(
-                        params.get(2) instanceof Integer ? params.get(0).toString().indexOf(
+                        (params.size() >=3 && params.get(2) instanceof Integer) ? params.get(0).toString().indexOf(
                             params.get(1).toString(), (Integer)params.get(2)
                         ) : params.get(0).toString().indexOf(params.get(1).toString())
                     );
@@ -256,7 +256,7 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                     /* %str_lastindexof_str,subStr% */
                     /* %str_lastindexof_str,subStr,<fromIndexi>% */
                     return Integer.toString(
-                        params.get(2) instanceof Integer ? params.get(0).toString().lastIndexOf(
+                        (params.size() >=3 && params.get(2) instanceof Integer) ? params.get(0).toString().lastIndexOf(
                             params.get(1).toString(), (Integer)params.get(2)
                         ) : params.get(0).toString().lastIndexOf(params.get(1).toString())
                     );
@@ -265,7 +265,7 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                     /* %str_startswith_str,prefix% */
                     /* %str_startswith_str,prefix,<offSeti>% */
                     return booleanToString(
-                        params.get(2) instanceof Integer ?
+                        (params.size() >=3 && params.get(2) instanceof Integer) ?
                         params.get(0).toString().startsWith(params.get(1).toString(), (Integer)params.get(2)) :
                         params.get(0).toString().startsWith(params.get(1).toString())
                     );
@@ -279,7 +279,7 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                 case "sub":
                     /* %str_substring_<beginIndexi>% */
                     /* %str_substring_<beginIndexi>,<endIndexi>% */
-                    return params.get(2) instanceof Integer ?
+                    return (params.size() >=3 && params.get(2) instanceof Integer) ?
                            params.get(0).toString().substring((Integer)params.get(1), (Integer)params.get(2)) :
                            params.get(0).toString().substring((Integer)params.get(1));
                 case "format":

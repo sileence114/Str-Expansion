@@ -32,7 +32,13 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 ## 可用占位符与方法
 | 方法 | 占位符格式 | 说明 | 简写 |
 | ---- | ---- | ---- | ---- |
-| equal | `%str_equal_str1,str2%` | 判断 `str1` 和 `str2` 是否一样 | `%str_eq_str1,str2%` `%str_=_str1,str2%` |
-| indexof | `%str_indexof_targetStr,str%` | 在`targetStr` 中查找  | `%str_eq_str1,str2%` `%str_=_str1,str2%` |
-| indexof | `%str_indexof_targetStr,str,<7i>%` | 判断 `str1` 和 `str2` 是否一样 | `%str_eq_str1,str2%` `%str_=_str1,str2%` |
+| equal | `%str_equal_str1,str2%` | 判断 `str1` 和 `str2` 是否一样。 | `%str_eq_str1,str2%` `%str_=_str1,str2%` |
+| indexof | `%str_indexof_targetStr,Str%` | 在 `targetStr` 中查找 `Str`，返回匹配序号，没找到返回`-1`。  | `%str_index_Str,Str%` |
+| indexof | `%str_indexof_targetStr,Str,<7i>%` | 在 `targetStr` 中从`7`开始查找 `Str`，返回匹配序号，没找到返回 `-1`。 | `%str_index_Str,Str,<7i>%` |
+| lastindexof | `%str_lastindexof_targetStr,Str%` | 在 `targetStr` 中反向查找 `Str`，返回匹配序号，没找到返回 `-1`。  | `%str_lastindexof_Str,Str%` |
+| lastindexof | `%str_lastindexof_targetStr,Str,<7i>%` | 在 `targetStr` 中反向从 `7` 开始查找 `Str`，返回匹配序号，没找到返回 `-1`。 | `%str_lastindexof_Str,Str,<7i>%` |
+| startswith | `%str_startswith_prefixStr,prefix%` | 判断 `prefixStr` 是否以 `prefix` 开头 | `%str_start_prefixStr,prefix%` |
+| startswith | `%str_startswith_prefixStr,prefix,<3i>%` | 从第 `3` 个字符开始，判断后面的半段 `prefixStr` 是否以 `prefix` 开头 | `%str_start_prefixStr,prefix,<3i>%` |
+| endswith | `%str_endswith_strSuffix,Suffix%` | 判断 `strSuffix` 是否以 `Suffix` 结尾 | `%str_ends_strSuffix,Suffix%` |
+| endswith | `%str_endswith_strSuffix,Suffix,<3i>%` | 从第 `3` 个字符开始，判断前面的半段 `strSuffix` 是否以 `Suffix` 结尾 | `%str_ends_strSuffix,Suffix,<3i>%` |
 
