@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.function.BiFunction;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -16,25 +17,25 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 
 public class StrExpansion extends PlaceholderExpansion implements Configurable {
-    private static final Logger LOGGER = PlaceholderAPIPlugin.getInstance().getLogger();
-    
-    private static final Pattern TRANSFORMED_PARAM = Pattern.compile("(?<!\\\\)<(.+)(?<!\\\\)>");
-    private static final Pattern INTEGER_PARAM = Pattern.compile("\\d+");
-    private static final Pattern FORCE_INTEGER_PARAM = Pattern.compile("\\d*\\.?\\d*(?=i)");
-    private static final Pattern DOUBLE_PARAM = Pattern.compile("\\d*\\.\\d*");
-    private static final Pattern FORCE_DOUBLE_PARAM = Pattern.compile("\\d*\\.?\\d*(?=d)");
-    private static final Pattern ASCII_PARAM_DECIMAL = Pattern.compile("\\d+(?=a)");
-    private static final Pattern ASCII_PARAM_HEXADECIMAL = Pattern.compile("\\d+(?=A)");
-    
-    private static String booleanToString(boolean b){
+    protected static final Logger LOGGER = PlaceholderAPIPlugin.getInstance().getLogger();
+    protected static final Pattern TRANSFORMED_PARAM = Pattern.compile("(?<!\\\\)<(.+)(?<!\\\\)>");
+    protected static final Pattern INTEGER_PARAM = Pattern.compile("\\d+");
+    protected static final Pattern FORCE_INTEGER_PARAM = Pattern.compile("\\d*\\.?\\d*(?=i)");
+    protected static final Pattern DOUBLE_PARAM = Pattern.compile("\\d*\\.\\d*");
+    protected static final Pattern FORCE_DOUBLE_PARAM = Pattern.compile("\\d*\\.?\\d*(?=d)");
+    protected static final Pattern ASCII_PARAM_DECIMAL = Pattern.compile("\\d+(?=a)");
+    protected static final Pattern ASCII_PARAM_HEXADECIMAL = Pattern.compile("\\d+(?=A)");
+    protected static final Pattern RECURSION_BRACKET_PLACEHOLDER  = Pattern.compile("(?<!^)(?:(?<=[{}])|(?=[{}]))(?!$)");
+    protected static String booleanToString(boolean b){
         return b ? booleanToStringTrue : booleanToStringFalse;
     }
-    
     protected static Object handleParam(OfflinePlayer player, String item){
-        item = PlaceholderAPI.setBracketPlaceholders(player, item);
-        Matcher transformMatcher = TRANSFORMED_PARAM.matcher(item);
+        if(PlaceholderAPI.containsBracketPlaceholders(item)){
+            item = bracketPlaceholders(player, item);
+        }
+        final Matcher transformMatcher = TRANSFORMED_PARAM.matcher(item);
         if(transformMatcher.find()){
-            String param = transformMatcher.group(1);
+            final String param = transformMatcher.group(1);
             String tmp;
             Matcher matcher = INTEGER_PARAM.matcher(param);
             if(matcher.matches()){
@@ -80,14 +81,18 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                    .replaceAll("\\\\\\\\", "\\\\");
     }
     protected static Object handleParamDebugged(OfflinePlayer player, String item){
-        StringBuilder debug = new StringBuilder("[String] Parameter: " + item + "    >    ");
-        item = PlaceholderAPI.setBracketPlaceholders(player, item);
-        debug.append(item).append("(BracketPlaceholders)    >    ");
-        Matcher transformMatcher = TRANSFORMED_PARAM.matcher(item);
+        final StringBuilder debug = new StringBuilder("[String] Parameter: " + item + "    >    ");
+        if(PlaceholderAPI.containsBracketPlaceholders(item)){
+            LOGGER.info(debug.append("[Parse bracket placeholder.]").toString());
+            debug.setLength(0);
+            item = bracketPlaceholders(player, item);
+            debug.append("[String] [Parse finished, continue.]    >    ").append(item).append("(BracketPlaceholders)    >    ");
+        }
+        final Matcher transformMatcher = TRANSFORMED_PARAM.matcher(item);
         if(transformMatcher.find()){
-            String param = transformMatcher.group(1);
+            final String param = transformMatcher.group(1);
+            debug.append(param).append("(TypeTransform)    >    ");
             String tmp;
-            debug.append(param).append("    >    ");
             /*
              * <32> -> 32
              * */
@@ -163,7 +168,6 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                 return false;
             }
         }
-        
         String result = item.replaceAll("(?<!\\\\)\\$", "%")
                             .replaceAll("\\\\\\$", "\\$")
                             .replaceAll("\\\\<", "<")
@@ -174,18 +178,50 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
         LOGGER.info(debug.toString());
         return result;
     }
-    private static BiFunction<OfflinePlayer, String, Object> handleParamFunc = StrExpansion::handleParam;
-    private static String trueBoolean = "&a●";
-    private static String falseBoolean = "&7○";
-    private static String booleanToStringTrue = "<t>";
-    private static String booleanToStringFalse = "<f>";
+    protected static String bracketPlaceholders(OfflinePlayer player, String str){
+        //  str = "{str_charat_{player_name,<0i>}}";
+        final Stack<String> stack = new Stack<>();
+        final List<String> split = Arrays.asList(RECURSION_BRACKET_PLACEHOLDER.split(str));
+        final long left = split.stream().filter("{"::equals).count();
+        long right = 0;
+        for (String s : split) {
+            if ("}".equals(s) && left >= right++) {
+                StringBuilder sb = new StringBuilder();
+                String tmp = "";
+                do{
+                    if(!"".equals(tmp)){
+                        sb.insert(0, tmp);
+                    }
+                    tmp = stack.pop();
+                }while(!"{".equals(tmp) && stack.size()!=0);
+                stack.push(PlaceholderAPI.setBracketPlaceholders(
+                    player, sb.insert(0, "{").append("}").toString()
+                ));
+            }
+            else {
+                stack.push(s);
+            }
+        }
+        if(stack.size() == 1){
+            return stack.pop();
+        }
+        else{
+            return str;
+        }
+    }
+    
+    protected static BiFunction<OfflinePlayer, String, Object> handleParamFunc = StrExpansion::handleParam;
+    protected static String trueBoolean = "&aO";
+    protected static String falseBoolean = "&7x";
+    protected static String booleanToStringTrue = "<t>";
+    protected static String booleanToStringFalse = "<f>";
     @Override
     public boolean canRegister() {
         handleParamFunc = "true".equals(getString("debug", "false")) ?
                           StrExpansion::handleParamDebugged :
                           StrExpansion::handleParam;
-        trueBoolean = getString("boolean.format.true", "&a●");
-        falseBoolean = getString("boolean.format.false", "&7○");
+        trueBoolean = getString("boolean.format.true", "&aO");
+        falseBoolean = getString("boolean.format.false", "&7x");
         if(!"true".equals(getString("boolean.output-parameter-format", "true"))){
             booleanToStringTrue = trueBoolean;
             booleanToStringFalse = falseBoolean;
@@ -199,10 +235,6 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
     @Override
     public String getIdentifier() {
         return "str";
-    }
-    @Override
-    public String getName() {
-        return "String";
     }
     @Override
     public String getVersion() {
@@ -228,13 +260,18 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
         * \, => ,
         * \\ => \
         * */
-        String[] values = identifier.split("_", 2);
-        List<Object> params = Arrays.stream(values[1].split("(?<!\\\\),(?![^{}]*+})")).map(
+        final String[] values = identifier.split("_", 2);
+        final List<Object> params = Arrays.stream(values[1].split("(?<!\\\\),(?![^{}]*+})")).map(
             param -> handleParamFunc.apply(player, param)
         ).collect(Collectors.toList());
         try{
             switch (values[0]){
                 // Java String Methods.
+                case "charat":
+                case "char":
+                    return Character.toString(
+                        params.get(0).toString().charAt(Integer.parseInt(params.get(1).toString()))
+                    );
                 case "equals":
                 case "eq":
                 case "=":
@@ -277,8 +314,8 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                 // TODO: String.replace()
                 case "substring":
                 case "sub":
-                    /* %str_substring_<beginIndexi>% */
-                    /* %str_substring_<beginIndexi>,<endIndexi>% */
+                    /* %str_substring_string_<beginIndexi>% */
+                    /* %str_substring_string_<beginIndexi>,<endIndexi>% */
                     return (params.size() >=3 && params.get(2) instanceof Integer) ?
                            params.get(0).toString().substring((Integer)params.get(1), (Integer)params.get(2)) :
                            params.get(0).toString().substring((Integer)params.get(1));
@@ -325,8 +362,8 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
         Map<String, Object> defaults = new HashMap<>();
         defaults.put("debug", false);
         defaults.put("boolean.output-parameter-format", true);
-        defaults.put("boolean.format.true", "&a⚫");
-        defaults.put("boolean.format.false", "&7⚪");
+        defaults.put("boolean.format.true", "&aO");
+        defaults.put("boolean.format.false", "&7x");
         return defaults;
     }
 }
