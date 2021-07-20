@@ -37,6 +37,7 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 > `%str_lowercase_{player_name}%`  
 > = `%str_lowercase_Silence114%`  
 > = `silence114`  
+>   
 > 如果你在控制台执行，且 `PlaceHolderAPI` 配置文件内将 `expansions.str.debug` 设置为 `true`，会得到如下结果。
 > ```
 > > papi parse Silence114 %str_lowercase_{player_name}%
@@ -44,6 +45,9 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 > [22:01:32 INFO]: [PlaceholderAPI] [String] [Parse finished, continue.] > Silence114(BracketPlaceholders) > Silence114
 > [22:01:32 INFO]: silence114
 > ```
+
+
+
 
 > 实例：获取玩家ID的首字母并将其大写（假设玩家名为 **`Silence114`**）
 > ```
@@ -54,8 +58,8 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 > > 方法：`charat`  
 > > 参数：`{player_name}` -> **`Silence114`**  
 > > 参数：`<0i>` -> `0`  
-> 
 > -> `S`  
+>   
 > `%str_uppercase_{str_charat_{player_name},<0i>}%`  
 > = `%str_uppercase_{str_charat_Sileence114,<0i>}%`  
 > = `%str_uppercase_S%`  
@@ -69,6 +73,7 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 > [22:02:56 INFO]: S
 > ```
 > 本例中 `uppercase` 似乎没有什么效果，但仍然不能忽略。那是因为不同玩家的ID不同，无法确定首字母是否一定是大写。
+
 ## 参数与数据类型
 
 因为直接调用到了 Java 的方法，Java 是强类型语言，调用一些方法必须要传入一些类型确定的参数，所以本拓展需要严格定义参数类型。
@@ -84,25 +89,25 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 | char | \<number`a`\> \<number`A`\> | `<37a>`=% `<37A>`=7 | 字符型，仅支持 ASCII 字符，number 表示字符在[ ASCII 码表]( https://tool.ip138.com/ascii_code/ )中的编码，小写的`a`表示这个编码是十进制的，大写的`A`表示这个编码是十六进制的。**注意：示例中的“7”表示的是`'7'`这个字符，而不是7这个数字。**|
 | boolean | \<`t`/`f`\> | `<t>`=true `<f>`=false | 布尔型，只有两种值，表示对与错，是与否，常用于表示判断结果。例如，“玩家在主世界”，当他在值就为true，不在值为false |
 
-
 ## 可用占位符与方法
-| 方法 | 占位符格式 | 说明 | 简写 |
-| ---- | ---- | ---- | ---- |
-| charat| `%str_charat_string_<0i>%` | 返回 `string` 中在 `0` 号位的字符。**字符串位置是从0开始计数的，即字符串最左端是第0个字符，下同。** | `%str_char_string_<0i>%` |
-| equal | `%str_equal_str1,str2%` | 判断 `str1` 和 `str2` 是否一样。 | `%str_eq_str1,str2%` `%str_=_str1,str2%` |
-| indexof | `%str_indexof_targetStr,Str%` | 在 `targetStr` 中查找 `Str`，返回匹配序号，没找到返回`-1`。  | `%str_index_Str,Str%` |
-| indexof | `%str_indexof_targetStr,Str,<7i>%` | 在 `targetStr` 中从 `7` 开始查找 `Str`，返回匹配序号，没找到返回 `-1`。 | `%str_index_Str,Str,<7i>%` |
-| lastindexof | `%str_lastindexof_targetStr,Str%` | 在 `targetStr` 中反向查找 `Str`，返回匹配序号，没找到返回 `-1`。  | `%str_lastindexof_Str,Str%` |
-| lastindexof | `%str_lastindexof_targetStr,Str,<7i>%` | 在 `targetStr` 中反向从 `7` 开始查找 `Str`，返回匹配序号，没找到返回 `-1`。 | `%str_lastindexof_Str,Str,<7i>%` |
-| startswith | `%str_startswith_prefixStr,prefix%` | 判断 `prefixStr` 是否以 `prefix` 开头 | `%str_start_prefixStr,prefix%` |
-| startswith | `%str_startswith_prefixStr,prefix,<3i>%` | 从第 `3` 个字符开始，判断后面的半段 `prefixStr` 是否以 `prefix` 开头 | `%str_start_prefixStr,prefix,<3i>%` |
-| endswith | `%str_endswith_strSuffix,Suffix%` | 判断 `strSuffix` 是否以 `Suffix` 结尾 | `%str_ends_strSuffix,Suffix%` |
-| endswith | `%str_endswith_strSuffix,Suffix,<3i>%` | 从第 `3` 个字符开始，判断前面的半段 `strSuffix` 是否以 `Suffix` 结尾 | `%str_ends_strSuffix,Suffix,<3i>%` |
-| substring | `%str_substring_string,<3i>%` | 返回 `string` 从 `3` 到结尾的部分 | `%str_sub_string,<3i>%` |
-| substring | `%str_substring_string,<2i>,<4i>%` | 返回 `string` 从 `2` 到 `4` 的部分 | `%str_sub_string,<2i>,<4i>%` |
-| format | `%str_format_template_,args1,args2,...%` | 格式化字符串，使用 `arg1`，`arg2` 等参数填入 `template` 模板。 | `%str_format_template_,args1,args2,...%` |
-| length | `%str_length_string%` | 返回 `string` 的长度 | `%str_len_string%` |
-| trim | `%str_trim_string%` | 删除 `string` 左右两端的空格返回 | |
-| uppercase | `%str_uppercase_string%` | 将 `string` 内所有字母转为大写 | `%str_upper_string%` |
-| lowercase | `%str_lowercase_string%` | 将 `string` 内所有字母转为小写 | `%str_lower_string%` |
-| boolean | `%str_boolean_<t>%` | 使用配置中的格式输出本拓展定义的布尔类型 | `%str_boolean_<t>%` |
+
+| 方法 | 占位符格式 | 参数类型 | 说明 | 简写 |
+| ---- | ---- | ---- | ---- | ---- |
+| charat| `%str_charat_string_<0i>%` | String, int | 返回 `string` 中在 `0` 号位的字符。**字符串位置是从0开始计数的，即字符串最左端是第0个字符，下同。** | char |
+| equal | `%str_equal_str1,str2%` | String, String | 判断 `str1` 和 `str2` 是否一样。 | eq, = |
+| indexof | `%str_indexof_targetStr,Str%` | String, String | 在 `targetStr` 中查找 `Str`，返回匹配序号，没找到返回`-1`。 | index |
+| indexof | `%str_indexof_targetStr,Str,<7i>%` | String, String, int | 在 `targetStr` 中从 `7` 开始查找 `Str`，返回匹配序号，没找到返回 `-1`。 | index |
+| lastindexof | `%str_lastindexof_targetStr,Str%` | String, String | 在 `targetStr` 中反向查找 `Str`，返回匹配序号，没找到返回 `-1`。 | last |
+| lastindexof | `%str_lastindexof_targetStr,Str,<7i>%` | String, String, int | 在 `targetStr` 中反向从 `7` 开始查找 `Str`，返回匹配序号，没找到返回 `-1`。 | last |
+| startswith | `%str_startswith_prefixStr,prefix%` | String, String | 判断 `prefixStr` 是否以 `prefix` 开头 | start |
+| startswith | `%str_startswith_prefixStr,prefix,<3i>%` | String, String, int | 从第 `3` 个字符开始，判断后面的半段 `prefixStr` 是否以 `prefix` 开头 | start |
+| endswith | `%str_endswith_strSuffix,Suffix%` | String, String | 判断 `strSuffix` 是否以 `Suffix` 结尾 | ends |
+| endswith | `%str_endswith_strSuffix,Suffix,<3i>%` | String, String, int | 从第 `3` 个字符开始，判断前面的半段 `strSuffix` 是否以 `Suffix` 结尾 | ends |
+| substring | `%str_substring_string,<3i>%` | String, int | 返回 `string` 从 `3` 到结尾的部分。 | sub |
+| substring | `%str_substring_string,<2i>,<4i>%` | String, int, int | 返回 `string` 从 `2` 到 `4` 的部分。注意，包含左端点，不包含右端点，左闭右开。 | sub |
+| format | `%str_format_template_,args1,args2,...%` | String, Object... | 格式化字符串，使用 `arg1`，`arg2` 等参数填入 `template` 模板。 | fmt |
+| length | `%str_length_string%` | String | 返回 `string` 的长度 | len |
+| trim | `%str_trim_string%` | String | 删除 `string` 左右两端的空格返回 | |
+| uppercase | `%str_uppercase_string%` | String | 将 `string` 内所有字母转为大写 | upper |
+| lowercase | `%str_lowercase_string%` | String | 将 `string` 内所有字母转为小写 | lower |
+| boolean | `%str_boolean_<t>%` | boolean | 使用配置中的格式输出本拓展定义的布尔类型 | bool |
