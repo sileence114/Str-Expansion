@@ -15,6 +15,7 @@ import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import me.clip.placeholderapi.expansion.Configurable;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
 
 public class StrExpansion extends PlaceholderExpansion implements Configurable {
     protected static final Logger LOGGER = PlaceholderAPIPlugin.getInstance().getLogger();
@@ -26,6 +27,8 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
     protected static final Pattern ASCII_PARAM_DECIMAL = Pattern.compile("\\d+(?=a)");
     protected static final Pattern ASCII_PARAM_HEXADECIMAL = Pattern.compile("\\d+(?=A)");
     protected static final Pattern RECURSION_BRACKET_PLACEHOLDER  = Pattern.compile("(?<!^)(?:(?<=[{}])|(?=[{}]))(?!$)");
+    
+    
     protected static String booleanToString(boolean b){
         return b ? booleanToStringTrue : booleanToStringFalse;
     }
@@ -209,6 +212,21 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
             return str;
         }
     }
+    protected static char getCharFromParam(Object p, char defaults){
+        char v = defaults;
+        if(p instanceof String){
+            v = (p.toString().length() == 0) ? defaults : p.toString().charAt(0);
+        }
+        else if(p instanceof Character){
+            v = (char)p;
+        }
+        return v;
+    }
+    protected static String charDuplicate(int length, char c){
+        char[] chars = new char[length];
+        Arrays.fill(chars, c);
+        return new String(chars);
+    }
     
     protected static BiFunction<OfflinePlayer, String, Object> handleParamFunc = StrExpansion::handleParam;
     protected static String trueBoolean = "&aO";
@@ -229,15 +247,15 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
         return true;
     }
     @Override
-    public String getAuthor() {
+    public @NotNull String getAuthor() {
         return "Silence";
     }
     @Override
-    public String getIdentifier() {
+    public @NotNull String getIdentifier() {
         return "str";
     }
     @Override
-    public String getVersion() {
+    public @NotNull String getVersion() {
         return "1.0.0";
     }
 
@@ -268,21 +286,17 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
             switch (values[0]){
                 // Java String Methods.
                 case "charat":
-                case "char":
                     return Character.toString(
                         params.get(0).toString().charAt(Integer.parseInt(params.get(1).toString()))
                     );
                 case "equals":
                 case "eq":
                 case "=":
-                    /* %str_equal_str1,str2% */
                     return booleanToString(
                         params.get(0).toString().equals(params.get(1).toString())
                     );
                 case "indexof":
                 case "index":
-                    /* %str_indexof_str,subStr% */
-                    /* %str_indexof_str,subStr,<fromIndex>% */
                     return Integer.toString(
                         (params.size() >=3 && params.get(2) instanceof Integer) ? params.get(0).toString().indexOf(
                             params.get(1).toString(), (Integer)params.get(2)
@@ -290,8 +304,6 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                     );
                 case "lastindexof":
                 case "lastindex":
-                    /* %str_lastindexof_str,subStr% */
-                    /* %str_lastindexof_str,subStr,<fromIndexi>% */
                     return Integer.toString(
                         (params.size() >=3 && params.get(2) instanceof Integer) ? params.get(0).toString().lastIndexOf(
                             params.get(1).toString(), (Integer)params.get(2)
@@ -299,8 +311,6 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                     );
                 case "startswith":
                 case "start":
-                    /* %str_startswith_str,prefix% */
-                    /* %str_startswith_str,prefix,<offSeti>% */
                     return booleanToString(
                         (params.size() >=3 && params.get(2) instanceof Integer) ?
                         params.get(0).toString().startsWith(params.get(1).toString(), (Integer)params.get(2)) :
@@ -308,43 +318,66 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                     );
                 case "endswith":
                 case "ends":
-                    /* %str_endswith_str,prefix% */
-                    /* %str_endswith_str,prefix,<offSeti>% */
                     return booleanToString(params.get(0).toString().endsWith(params.get(1).toString()));
                 // TODO: String.replace()
                 case "substring":
                 case "sub":
-                    /* %str_substring_string_<beginIndexi>% */
-                    /* %str_substring_string_<beginIndexi>,<endIndexi>% */
                     return (params.size() >=3 && params.get(2) instanceof Integer) ?
                            params.get(0).toString().substring((Integer)params.get(1), (Integer)params.get(2)) :
                            params.get(0).toString().substring((Integer)params.get(1));
                 case "format":
                 case "fmt":
-                    /* %str_format_format,args1,args2...% */
                     return String.format(
                         params.get(0).toString(),
                         params.subList(1, params.size()).toArray()
                     );
                 case "length":
                 case "len":
-                    /* %str_length_str% */
                     return Integer.toString(params.get(0).toString().length());
                 case "trim":
-                    /* %str_trim_str% */
                     return params.get(0).toString().trim();
                 case "uppercase":
                 case "upper":
-                    /* %str_uppercase_str% */
                     return params.get(0).toString().toUpperCase();
                 case "lowercase":
                 case "lower":
-                    /* %str_uppercase_str% */
                     return params.get(0).toString().toLowerCase();
-                // Costume Methods.
+                // Data Output
                 case "boolean":
                 case "bool":
                     return (boolean)params.get(0) ? trueBoolean : falseBoolean;
+                case "char":
+                    return Character.toString(
+                        (char)Integer.parseInt(params.get(0).toString())
+                    );
+                // Python Methods.
+                case "capitalize":
+                    StringBuilder sb0 = new StringBuilder(params.get(0).toString());
+                    if(sb0.isEmpty()){
+                        return "";
+                    }
+                    char c0 = sb0.charAt(0);
+                    if(c0>=97 && c0<=122){
+                        sb0.setCharAt(0, (char)(c0-32));
+                    }
+                    return sb0.toString();
+                case "center":
+                    StringBuilder sb1 = new StringBuilder(params.get(0).toString());
+                    if(params.size() == 1){
+                        return sb1.toString();
+                    }
+                    int length = sb1.length();
+                    int size = Integer.parseInt(params.get(1).toString());
+                    if(length >= size){
+                        return sb1.substring(0, size);
+                    }
+                    char c1 = params.size() == 3 ? getCharFromParam(params.get(2), ' ') : ' ';
+                    sb1.insert(
+                        0, charDuplicate((size-length)/2, c1)
+                    ).append(charDuplicate(
+                        (int)Math.ceil((size - length) / 2d), c1
+                    ));
+                    return sb1.toString();
             }
         }
         catch (Exception e){

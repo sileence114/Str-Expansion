@@ -81,7 +81,7 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 > 主要是由于C语言风格的 `String.format()` 格式化字符串必须要参数与标示符类型相匹配。
 
 | Java 数据类型 | 扩展参数格式 | 示例 | 说明 |
-|  :----:  | :----:  |  :----  | :----  |
+| :----: | :----: | :---- | :---- |
 | String | | Minecraft | 字符串类型，无法识别类型的参数都会被视作字符串。如，玩家的 ID，服务器的名称都是字符串类型。 |
 | int | \<number`i`\> | `<2i>`=2 `<2.4i>`=2 `<2.9i>`=2 | 整数型，由尖括号`<>`包裹数字，并用`i`强调它是 int：整型。若这个数字有小数部分，会被向下取整。如玩家的等级，玩家的生命值都是整型 |
 | double | \<number`d`\> | `<2d>`=2.0 `<2.4d>`=2.4 `<.9d>`=0.9 | 浮点数类型~~（可以简单的理解为有小数的类型，但实际上是**双**精度浮点型）~~，由尖括号`<>`包裹数字，并用`d`强调它是 double：浮点型。若这个数字有小数部分，会被向下取整。如玩家的位置等都是浮点型。 |
@@ -89,25 +89,42 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 | char | \<number`a`\> \<number`A`\> | `<37a>`=% `<37A>`=7 | 字符型，仅支持 ASCII 字符，number 表示字符在[ ASCII 码表]( https://tool.ip138.com/ascii_code/ )中的编码，小写的`a`表示这个编码是十进制的，大写的`A`表示这个编码是十六进制的。**注意：示例中的“7”表示的是`'7'`这个字符，而不是7这个数字。**|
 | boolean | \<`t`/`f`\> | `<t>`=true `<f>`=false | 布尔型，只有两种值，表示对与错，是与否，常用于表示判断结果。例如，“玩家在主世界”，当他在值就为true，不在值为false |
 
+**注意：考虑到方法中输入 ASCII 码表示字符参数比较困难，所有字符参数都会自动将长度为1的字符串转换为字符。**（长度大于1则取首字符）
+
 ## 可用占位符与方法
 
+### Java内建方法
+
 | 方法 | 占位符格式 | 参数类型 | 说明 | 简写 |
-| ---- | ---- | ---- | ---- | ---- |
-| charat| `%str_charat_string_<0i>%` | String, int | 返回 `string` 中在 `0` 号位的字符。**字符串位置是从0开始计数的，即字符串最左端是第0个字符，下同。** | char |
+| :----: | :---- | :---- | :---- | :----: |
+| charat| `%str_charat_string_<0i>%` | String, int | 返回 `string` 中在 `0` 号位的字符。**字符串位置是从0开始计数的，即字符串最左端是第0个字符，下同。** | |
 | equal | `%str_equal_str1,str2%` | String, String | 判断 `str1` 和 `str2` 是否一样。 | eq, = |
 | indexof | `%str_indexof_targetStr,Str%` | String, String | 在 `targetStr` 中查找 `Str`，返回匹配序号，没找到返回`-1`。 | index |
 | indexof | `%str_indexof_targetStr,Str,<7i>%` | String, String, int | 在 `targetStr` 中从 `7` 开始查找 `Str`，返回匹配序号，没找到返回 `-1`。 | index |
 | lastindexof | `%str_lastindexof_targetStr,Str%` | String, String | 在 `targetStr` 中反向查找 `Str`，返回匹配序号，没找到返回 `-1`。 | last |
 | lastindexof | `%str_lastindexof_targetStr,Str,<7i>%` | String, String, int | 在 `targetStr` 中反向从 `7` 开始查找 `Str`，返回匹配序号，没找到返回 `-1`。 | last |
-| startswith | `%str_startswith_prefixStr,prefix%` | String, String | 判断 `prefixStr` 是否以 `prefix` 开头 | start |
-| startswith | `%str_startswith_prefixStr,prefix,<3i>%` | String, String, int | 从第 `3` 个字符开始，判断后面的半段 `prefixStr` 是否以 `prefix` 开头 | start |
-| endswith | `%str_endswith_strSuffix,Suffix%` | String, String | 判断 `strSuffix` 是否以 `Suffix` 结尾 | ends |
-| endswith | `%str_endswith_strSuffix,Suffix,<3i>%` | String, String, int | 从第 `3` 个字符开始，判断前面的半段 `strSuffix` 是否以 `Suffix` 结尾 | ends |
+| startswith | `%str_startswith_prefixStr,prefix%` | String, String | 判断 `prefixStr` 是否以 `prefix` 开头。 | start |
+| startswith | `%str_startswith_prefixStr,prefix,<3i>%` | String, String, int | 从第 `3` 个字符开始，判断后面的半段 `prefixStr` 是否以 `prefix` 开头。 | start |
+| endswith | `%str_endswith_strSuffix,Suffix%` | String, String | 判断 `strSuffix` 是否以 `Suffix` 结尾。 | ends |
+| endswith | `%str_endswith_strSuffix,Suffix,<3i>%` | String, String, int | 从第 `3` 个字符开始，判断前面的半段 `strSuffix` 是否以 `Suffix` 结尾。 | ends |
 | substring | `%str_substring_string,<3i>%` | String, int | 返回 `string` 从 `3` 到结尾的部分。 | sub |
 | substring | `%str_substring_string,<2i>,<4i>%` | String, int, int | 返回 `string` 从 `2` 到 `4` 的部分。注意，包含左端点，不包含右端点，左闭右开。 | sub |
 | format | `%str_format_template_,args1,args2,...%` | String, Object... | 格式化字符串，使用 `arg1`，`arg2` 等参数填入 `template` 模板。 | fmt |
-| length | `%str_length_string%` | String | 返回 `string` 的长度 | len |
-| trim | `%str_trim_string%` | String | 删除 `string` 左右两端的空格返回 | |
-| uppercase | `%str_uppercase_string%` | String | 将 `string` 内所有字母转为大写 | upper |
-| lowercase | `%str_lowercase_string%` | String | 将 `string` 内所有字母转为小写 | lower |
-| boolean | `%str_boolean_<t>%` | boolean | 使用配置中的格式输出本拓展定义的布尔类型 | bool |
+| length | `%str_length_string%` | String | 返回 `string` 的长度。 | len |
+| trim | `%str_trim_string%` | String | 删除 `string` 左右两端的空格返回。 | |
+| uppercase | `%str_uppercase_string%` | String | 将 `string` 内所有字母转为大写。 | upper |
+| lowercase | `%str_lowercase_string%` | String | 将 `string` 内所有字母转为小写。 | lower |
+
+### 拓展数据输出方法
+| 方法 | 占位符格式 | 参数类型 | 说明 | 简写 |
+| :----: | :---- | :---- | :---- | :----: |
+| boolean | `%str_boolean_<t>%` | boolean | 使用配置中的格式输出本拓展定义的布尔类型。 | bool |
+| char | `%str_char_<37a>%` | char | 返回 `<37a>` 对应的字符，本例返回 `%` | |
+
+### Python部分字符串方法实现
+| 方法 | 占位符格式 | 参数类型 | 说明 | 简写 |
+| :----: | :---- | :---- | :---- | :----: |
+| capitalize | `str_capitalize_alice` | String | 首字母大写，若首字符不是小写字母则原样返回 | |
+| center | `str_center_str,<10i>` | String, int | 将 `str` 左右两端填充空格，直至长度为 `10` | |
+| center | `str_center_str,<10i>,-` | String, int | 将 `str` 左右两端填充 `-`，直至长度为 `10` | |
+| | | | | |
