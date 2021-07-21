@@ -263,7 +263,7 @@ expansions:
 
 ### 空白
 
-部分版本的 Minecraft 客户端的空格宽度和其他字母的宽度不一致，导致表格排版混乱，因此可以用 `-`、`_`、`◼️️` 等字符，并将他们颜色设置为黑色 `&0` 、灰色 `&7` 或者深灰色 `&8` 使他们不那么容易被看出来，还能占一个字母的宽度。  其他颜色可用参考 [Minecraft Wiki - 格式化代码]( https://minecraft.fandom.com/zh/wiki/%E6%A0%BC%E5%BC%8F%E5%8C%96%E4%BB%A3%E7%A0%81 )
+部分版本的 Minecraft 客户端的空格宽度和其他字母的宽度不一致，导致表格排版混乱，因此可以用 `-`、`_`、`◼️️` 等字符，并将他们颜色设置为黑色 `&0` 、灰色 `&7` 或者深灰色 `&8` 使他们不那么容易被看出来，还能占一个字母的宽度。  其他颜色可用参考 [Minecraft Wiki - 格式化代码]( https://minecraft.fandom.com/zh/wiki/%E6%A0%BC%E5%BC%8F%E5%8C%96%E4%BB%A3%E7%A0%81 )。  
 通过 `%str_center_abc,<10i>,-%`、`%str_ljust_abc,<10i>,-%` 和 `%str_rjust_abc,<10i>,-%` 展示这三个方法的运作原理，并介绍 `head` 和 `tail` 的位置。  
 首先通过 `/papi parse` 命令查看执行结果如何：
 ```
