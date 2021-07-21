@@ -64,6 +64,7 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 > = `%str_uppercase_{str_charat_Sileence114,<0i>}%`  
 > = `%str_uppercase_S%`  
 > = `S`  
+> 
 > ```
 > > papi parse Silence114 %str_uppercase_{str_charat_{player_name},<0i>}%
 > [22:02:56 INFO]: [PlaceholderAPI] [String] Parameter: {str_charat_{player_name},<0i>} > [Parse bracket placeholder.]
@@ -90,6 +91,14 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 | boolean | \<`t`/`f`\> | `<t>`=true `<f>`=false | 布尔型，只有两种值，表示对与错，是与否，常用于表示判断结果。例如，“玩家在主世界”，当他在值就为true，不在值为false |
 
 **注意：考虑到方法中输入 ASCII 码表示字符参数比较困难，所有字符参数都会自动将长度为1的字符串转换为字符。**（长度大于1则取首字符）
+由于一些格式字符已经被占用，下列字符需要转义，仅在确认无法转换成其他字符时才会还原转义，并将其是别为字符串。
+| 字符 | 转义表达 | 占用原因 |
+| `%` | `$` | PlaceHolder 标识符 |
+| `$` | `\$` | 转义 `%`，format 方法中会大量用到百分号。 |
+| `<` | `\<` | 类型转换识别 |
+| `>` | `\>` | 类型转换识别 |
+| `,` | `\,` | 参数间隔标识 |
+| `\` | `\\` | 转义标识 |
 
 ## 可用占位符与方法
 
@@ -97,34 +106,145 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 
 | 方法 | 占位符格式 | 参数类型 | 说明 | 简写 |
 | :----: | :---- | :---- | :---- | :----: |
-| charat| `%str_charat_string_<0i>%` | String, int | 返回 `string` 中在 `0` 号位的字符。**字符串位置是从0开始计数的，即字符串最左端是第0个字符，下同。** | |
-| equal | `%str_equal_str1,str2%` | String, String | 判断 `str1` 和 `str2` 是否一样。 | eq, = |
-| indexof | `%str_indexof_targetStr,Str%` | String, String | 在 `targetStr` 中查找 `Str`，返回匹配序号，没找到返回`-1`。 | index |
+| charat| `%str_charat_string,<0i>%`<br>`%str_charat_string,<1i>%` | String, int | 返回 `string` 中在 `0` 号位的字符。**字符串位置是从0开始计数的，即字符串最左端是第0个字符，下同。** | |
+| equal | `%str_equals_str1,str2%`<br>`%str_equals_str1,str1%` | String, String | 判断 `str1` 和 `str2` 是否一样。 | eq, = |
+| indexof | `%str_indexof_targetStr,Str%`<br>`%str_indexof_targetStr,get%` | String, String | 在 `targetStr` 中查找 `Str`，返回匹配序号，没找到返回`-1`。 | index |
 | indexof | `%str_indexof_targetStr,Str,<7i>%` | String, String, int | 在 `targetStr` 中从 `7` 开始查找 `Str`，返回匹配序号，没找到返回 `-1`。 | index |
 | lastindexof | `%str_lastindexof_targetStr,Str%` | String, String | 在 `targetStr` 中反向查找 `Str`，返回匹配序号，没找到返回 `-1`。 | last |
 | lastindexof | `%str_lastindexof_targetStr,Str,<7i>%` | String, String, int | 在 `targetStr` 中反向从 `7` 开始查找 `Str`，返回匹配序号，没找到返回 `-1`。 | last |
-| startswith | `%str_startswith_prefixStr,prefix%` | String, String | 判断 `prefixStr` 是否以 `prefix` 开头。 | start |
-| startswith | `%str_startswith_prefixStr,prefix,<3i>%` | String, String, int | 从第 `3` 个字符开始，判断后面的半段 `prefixStr` 是否以 `prefix` 开头。 | start |
+| startswith | `%str_startswith_prefixStr,prefix%`<br>`%str_startswith_prefixStr,fix%` | String, String | 判断 `prefixStr` 是否以 `prefix` 开头。 | start |
+| startswith | `%str_startswith_prefixStr,prefix,<3i>%`<br>`%str_startswith_prefixStr,fix,<3i>%` | String, String, int | 从第 `3` 个字符开始，判断后面的半段 `prefixStr` 是否以 `prefix` 开头。 | start |
 | endswith | `%str_endswith_strSuffix,Suffix%` | String, String | 判断 `strSuffix` 是否以 `Suffix` 结尾。 | ends |
 | endswith | `%str_endswith_strSuffix,Suffix,<3i>%` | String, String, int | 从第 `3` 个字符开始，判断前面的半段 `strSuffix` 是否以 `Suffix` 结尾。 | ends |
+| replace | `%str_replace_minecraft_mine_our%` | String, String, String | 将 `minecraft` 中所有 `mine` 替换为 `our`，**区分大小写。** | |
 | substring | `%str_substring_string,<3i>%` | String, int | 返回 `string` 从 `3` 到结尾的部分。 | sub |
 | substring | `%str_substring_string,<2i>,<4i>%` | String, int, int | 返回 `string` 从 `2` 到 `4` 的部分。注意，包含左端点，不包含右端点，左闭右开。 | sub |
-| format | `%str_format_template_,args1,args2,...%` | String, Object... | 格式化字符串，使用 `arg1`，`arg2` 等参数填入 `template` 模板。 | fmt |
-| length | `%str_length_string%` | String | 返回 `string` 的长度。 | len |
+| format | `%str_format_template_,args1,args2,...%`<br>`%str_format_TPS:$.2f,<{server_tps_1}d>%` | String, Object... | 格式化字符串，使用 `arg1`，`arg2` 等参数填入 `template` 模板。这是一个高级方法，需要您了解 [C 语言]( https://www.cplusplus.com/reference/cstdio/printf/ )或 [Java]( http://www.java2s.com/Tutorials/Java/Java_Format/0050__Java_Printf_Style_Overview.htm ) 中关于格式化字符串相关的知识。<br>**使用 `$` 代替模板中的 `%` ** | fmt |
+| length | `%str_length_string%`<br>`%str_length_minecraft%` | String | 返回 `string` 的长度。 | len |
 | trim | `%str_trim_string%` | String | 删除 `string` 左右两端的空格返回。 | |
-| uppercase | `%str_uppercase_string%` | String | 将 `string` 内所有字母转为大写。 | upper |
-| lowercase | `%str_lowercase_string%` | String | 将 `string` 内所有字母转为小写。 | lower |
+| uppercase | `%str_uppercase_string%`<br>`%str_uppercase_StRing%` | String | 将 `string` 内所有字母转为大写。 | upper |
+| lowercase | `%str_lowercase_string%`<br>`%str_lowercase_StRing%` | String | 将 `string` 内所有字母转为小写。 | lower |
+
+> 在控制台解析这些占位符
+> ```
+> > papi parse Silence114 %str_charat_string,<0i>%
+> [17:47:12 INFO]: s
+> > papi parse Silence114 %str_charat_string,<1i>%
+> [17:47:27 INFO]: t
+> > papi parse Silence114 %str_equals_str1,str2%
+> [17:49:19 INFO]: <f>
+> > papi parse Silence114 %str_equals_str1,str1%
+> [17:49:21 INFO]: <t>
+> > papi parse Silence114 %str_indexof_targetStr,Str%
+> [17:49:58 INFO]: 6
+> > papi parse Silence114 %str_indexof_targetStr,get%
+> [17:50:10 INFO]: 3
+> > papi parse Silence114 %str_indexof_targetStr,Str,<7i>%
+> [17:50:50 INFO]: -1
+> > papi parse Silence114 %str_lastindexof_targetStr,Str%
+> [17:51:19 INFO]: 6
+> > papi parse Silence114 %str_lastindexof_targetStr,Str,<7i>%
+> [17:51:36 INFO]: 6
+> > papi parse Silence114 %str_startswith_prefixStr,prefix%
+> [17:52:30 INFO]: <t>
+> > papi parse Silence114 %str_startswith_prefixStr,fix%
+> [17:52:34 INFO]: <f>
+> > papi parse Silence114 %str_startswith_prefixStr,prefix,<3i>%
+> [17:52:57 INFO]: <f>
+> > papi parse Silence114 %str_startswith_prefixStr,fix,<3i>%
+> [17:53:10 INFO]: <t>
+> > papi parse Silence114 %str_endswith_strSuffix,Suffix%
+> [17:53:45 INFO]: <t>
+> > papi parse Silence114 %str_endswith_strSuffix,Suffix,<3i>%
+> [17:53:57 INFO]: <t>
+> > papi parse Silence114 %str_replace_minecraft,mine,our%
+> [17:55:12 INFO]: ourcraft
+> > papi parse Silence114 %str_substring_string,<3i>%
+> [17:55:33 INFO]: ing
+> > papi parse Silence114 %str_substring_string,<2i>,<4i>%
+> [17:55:46 INFO]: ri
+> > papi parse Silence114 %str_format_TPS:$.2f,<{server_tps_1}d>%
+> [18:51:14 INFO]: TPS:20.00
+> > papi parse Silence114 %str_length_string%
+> [19:04:22 INFO]: 6
+> > papi parse Silence114 %str_length_minecraft%
+> [19:04:29 INFO]: 9
+> > papi parse Silence114 %str_trim_ Hi! %
+> [19:05:39 INFO]: Hi!
+> > papi parse Silence114 %str_uppercase_string%
+> [19:07:12 INFO]: STRING
+> > papi parse Silence114 %str_uppercase_StRing%
+> [19:07:17 INFO]: STRING
+> > papi parse Silence114 %str_lowercase_string%
+> [19:07:53 INFO]: string
+> > papi parse Silence114 %str_lowercase_StRing%
+> [19:08:08 INFO]: string
+> ```
 
 ### 拓展数据输出方法
 | 方法 | 占位符格式 | 参数类型 | 说明 | 简写 |
 | :----: | :---- | :---- | :---- | :----: |
-| boolean | `%str_boolean_<t>%` | boolean | 使用配置中的格式输出本拓展定义的布尔类型。 | bool |
-| char | `%str_char_<37a>%` | char | 返回 `<37a>` 对应的字符，本例返回 `%` | |
+| boolean | `%str_boolean_<t>%`<br>`%str_boolean_<f>%` | boolean | 使用配置中的格式输出本拓展定义的布尔类型。 | bool |
+| char | `%str_char_<37a>%`<br>`%str_char_<37>%` | int or char | 返回 `<37a>` 对应的字符，本例返回 `%` | |
+
+> 在控制台解析这些占位符
+> ```
+> > papi parse Silence114 %str_boolean_<t>%
+> [17:39:15 INFO]: O
+> > papi parse Silence114 %str_boolean_<f>%
+> [17:39:18 INFO]: x
+> > papi parse Silence114 %str_char_<37a>%
+> [17:39:26 INFO]: %
+> > papi parse Silence114 %str_char_<37>%
+> [17:39:29 INFO]: %
+> ```
 
 ### Python部分字符串方法实现
 | 方法 | 占位符格式 | 参数类型 | 说明 | 简写 |
 | :----: | :---- | :---- | :---- | :----: |
-| capitalize | `str_capitalize_alice` | String | 首字母大写，若首字符不是小写字母则原样返回 | |
-| center | `str_center_str,<10i>` | String, int | 将 `str` 左右两端填充空格，直至长度为 `10` | |
-| center | `str_center_str,<10i>,-` | String, int | 将 `str` 左右两端填充 `-`，直至长度为 `10` | |
-| | | | | |
+| capitalize | `%str_capitalize_alice%` | String | 首字母大写，若首字符不是小写字母则原样返回 | |
+| center | `%str_center_str,<10i>%` | String, int | 剧中，将 `str` 左右两端填充空格，直至长度为 `10` | |
+| center | `%str_center_str,<10i>,-%` | String, int, char | 剧中，将 `str` 左右两端填充 `-`，直至长度为 `10` | |
+| ljust | `%str_ljust_str,<10i>%` | String, int | 左对齐，将 `str` 右端填充空格，直至长度为 `10` | |
+| ljust | `%str_ljust_str,<10i>,-%` | String, int, char | 左对齐，将 `str` 右端填充 `-`，直至长度为 `10` | |
+| rjust | `%str_rjust_str,<10i>%` | String, int | 右对齐，将 `str` 左端填充空格，直至长度为 `10` | |
+| rjust | `%str_rjust_str,<10i>,-`% | String, int, char | 右对齐，将 `str` 左端填充 `-`，直至长度为 `10` | |
+
+> `center`，`ljust` 和 `rjust` 可以很方便地制作整齐、漂亮的列表，如聊天区域的列表，记分板列表，甚至 Tab 列表。
+
+> 在控制台解析这些占位符
+> ```
+> > papi parse Silence114 %str_capitalize_alice%
+> [17:16:46 INFO]: Alice
+> > papi parse Silence114 %str_center_str,<10i>%
+> [17:17:03 INFO]:    str
+> > papi parse Silence114 %str_center_str,<10i>,-%
+> [17:17:21 INFO]: ---str----
+> > papi parse Silence114 %str_ljust_str,<10i>%
+> [17:18:53 INFO]: str
+> > papi parse Silence114 %str_ljust_str,<10i>,-%
+> [17:19:01 INFO]: str-------
+> > papi parse Silence114 %str_rjust_str,<10i>%
+> [17:19:08 INFO]:        str
+> > papi parse Silence114 %str_rjust_str,<10i>,-%
+> [17:19:13 INFO]: -------str
+> ```
+
+## 配置文件
+```yaml
+expansions:
+  str:
+    debug: false
+    boolean:
+      format:
+        'true': '&aO'
+        'false': '&7x'
+      output-parameter-format: true
+    blank:
+      tail:
+        suffix: ''
+        prefix: ''
+      head:
+        suffix: ''
+        prefix: ''
+```

@@ -1,11 +1,15 @@
 package pub.silence.papi.expansion;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,7 +58,6 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
             if(matcher.find()){
                 tmp = matcher.group(0);
                 return ".".equals(tmp) ? 0d : Double.parseDouble(tmp);
-                
             }
             matcher = FORCE_DOUBLE_PARAM.matcher(param);
             if(matcher.find()){
@@ -208,6 +211,9 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
         if(stack.size() == 1){
             return stack.pop();
         }
+        else if(stack.size() > 1){
+            return String.join("", stack);
+        }
         else{
             return str;
         }
@@ -228,11 +234,16 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
         return new String(chars);
     }
     
+    
     protected static BiFunction<OfflinePlayer, String, Object> handleParamFunc = StrExpansion::handleParam;
     protected static String trueBoolean = "&aO";
     protected static String falseBoolean = "&7x";
     protected static String booleanToStringTrue = "<t>";
     protected static String booleanToStringFalse = "<f>";
+    protected static String headPrefix = "";
+    protected static String headSuffix = "";
+    protected static String tailPrefix = "";
+    protected static String tailSuffix = "";
     @Override
     public boolean canRegister() {
         handleParamFunc = "true".equals(getString("debug", "false")) ?
@@ -240,6 +251,10 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                           StrExpansion::handleParam;
         trueBoolean = getString("boolean.format.true", "&aO");
         falseBoolean = getString("boolean.format.false", "&7x");
+        headPrefix = getString("blank.head.prefix", "");
+        headSuffix = getString("blank.head.suffix", "");
+        tailPrefix = getString("blank.tail.prefix", "");
+        tailSuffix = getString("blank.tail.suffix", "");
         if(!"true".equals(getString("boolean.output-parameter-format", "true"))){
             booleanToStringTrue = trueBoolean;
             booleanToStringFalse = falseBoolean;
@@ -285,10 +300,11 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
         try{
             switch (values[0]){
                 // Java String Methods.
-                case "charat":
-                    return Character.toString(
-                        params.get(0).toString().charAt(Integer.parseInt(params.get(1).toString()))
-                    );
+                case "charat": {
+                        return Character.toString(
+                            params.get(0).toString().charAt(Integer.parseInt(params.get(1).toString()))
+                        );
+                }
                 case "equals":
                 case "eq":
                 case "=":
@@ -305,26 +321,29 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                 case "lastindexof":
                 case "lastindex":
                     return Integer.toString(
-                        (params.size() >=3 && params.get(2) instanceof Integer) ? params.get(0).toString().lastIndexOf(
-                            params.get(1).toString(), (Integer)params.get(2)
+                        (params.size() >= 3 && params.get(2) instanceof Integer) ? params.get(0).toString().lastIndexOf(
+                            params.get(1).toString(), (Integer) params.get(2)
                         ) : params.get(0).toString().lastIndexOf(params.get(1).toString())
                     );
                 case "startswith":
                 case "start":
                     return booleanToString(
-                        (params.size() >=3 && params.get(2) instanceof Integer) ?
-                        params.get(0).toString().startsWith(params.get(1).toString(), (Integer)params.get(2)) :
+                        (params.size() >= 3 && params.get(2) instanceof Integer) ?
+                        params.get(0).toString().startsWith(params.get(1).toString(), (Integer) params.get(2)) :
                         params.get(0).toString().startsWith(params.get(1).toString())
                     );
                 case "endswith":
                 case "ends":
                     return booleanToString(params.get(0).toString().endsWith(params.get(1).toString()));
-                // TODO: String.replace()
+                // TODO: String.replaceAll(regex, replacement)
+                case "replace": {
+                    return params.get(0).toString().replace(params.get(1).toString(), params.get(2).toString());
+                }
                 case "substring":
                 case "sub":
-                    return (params.size() >=3 && params.get(2) instanceof Integer) ?
-                           params.get(0).toString().substring((Integer)params.get(1), (Integer)params.get(2)) :
-                           params.get(0).toString().substring((Integer)params.get(1));
+                    return (params.size() >= 3 && params.get(2) instanceof Integer) ?
+                           params.get(0).toString().substring((Integer) params.get(1), (Integer) params.get(2)) :
+                           params.get(0).toString().substring((Integer) params.get(1));
                 case "format":
                 case "fmt":
                     return String.format(
@@ -334,8 +353,9 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                 case "length":
                 case "len":
                     return Integer.toString(params.get(0).toString().length());
-                case "trim":
+                case "trim": {
                     return params.get(0).toString().trim();
+                }
                 case "uppercase":
                 case "upper":
                     return params.get(0).toString().toUpperCase();
@@ -345,39 +365,100 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                 // Data Output
                 case "boolean":
                 case "bool":
-                    return (boolean)params.get(0) ? trueBoolean : falseBoolean;
-                case "char":
-                    return Character.toString(
-                        (char)Integer.parseInt(params.get(0).toString())
-                    );
+                    return (boolean) params.get(0) ? trueBoolean : falseBoolean;
+                case "char": {
+                    return params.get(0) instanceof Character ? Character.toString((char) params.get(0)) :
+                           params.get(0) instanceof Integer ? Character.toString((char) (int) params.get(0)) : "";
+                }
                 // Python Methods.
-                case "capitalize":
-                    StringBuilder sb0 = new StringBuilder(params.get(0).toString());
-                    if(sb0.isEmpty()){
+                case "capitalize": {
+                    StringBuilder capitalizeStringBuilder = new StringBuilder(params.get(0).toString());
+                    if (capitalizeStringBuilder.length() == 0) {
                         return "";
                     }
-                    char c0 = sb0.charAt(0);
-                    if(c0>=97 && c0<=122){
-                        sb0.setCharAt(0, (char)(c0-32));
+                    char capitalizeChar = capitalizeStringBuilder.charAt(0);
+                    if (capitalizeChar >= 97 && capitalizeChar <= 122) {
+                        capitalizeStringBuilder.setCharAt(0, (char) (capitalizeChar - 32));
                     }
-                    return sb0.toString();
-                case "center":
-                    StringBuilder sb1 = new StringBuilder(params.get(0).toString());
-                    if(params.size() == 1){
-                        return sb1.toString();
+                    return capitalizeStringBuilder.toString();
+                }
+                case "center": {
+                    StringBuilder centerStringBuilder = new StringBuilder(params.get(0).toString());
+                    if (params.size() == 1) {
+                        return centerStringBuilder.toString();
                     }
-                    int length = sb1.length();
-                    int size = Integer.parseInt(params.get(1).toString());
-                    if(length >= size){
-                        return sb1.substring(0, size);
+                    int centerInputLength = centerStringBuilder.length();
+                    int centerTargetSize = Integer.parseInt(params.get(1).toString());
+                    if (centerInputLength >= centerTargetSize) {
+                        return centerStringBuilder.substring(0, centerTargetSize);
                     }
-                    char c1 = params.size() == 3 ? getCharFromParam(params.get(2), ' ') : ' ';
-                    sb1.insert(
-                        0, charDuplicate((size-length)/2, c1)
-                    ).append(charDuplicate(
-                        (int)Math.ceil((size - length) / 2d), c1
-                    ));
-                    return sb1.toString();
+                    char centerBlankChar = params.size() == 3 ? getCharFromParam(params.get(2), ' ') : ' ';
+                    centerStringBuilder.insert(0, headSuffix)
+                                       .insert(0, charDuplicate((centerTargetSize - centerInputLength) / 2, centerBlankChar))
+                                       .insert(0, headPrefix)
+                                       .append(tailPrefix)
+                                       .append(charDuplicate((int) Math.ceil((centerTargetSize - centerInputLength) / 2d),
+                                                             centerBlankChar
+                                       ))
+                                       .append(tailSuffix);
+                    return centerStringBuilder.toString();
+                }
+                case "ljust": {
+                    StringBuilder ljustStringBuilder = new StringBuilder(params.get(0).toString());
+                    if (params.size() == 1) {
+                        return ljustStringBuilder.toString();
+                    }
+                    int ljustInputLength = ljustStringBuilder.length();
+                    int ljustTargetSize = Integer.parseInt(params.get(1).toString());
+                    if (ljustInputLength >= ljustTargetSize) {
+                        return ljustStringBuilder.substring(0, ljustTargetSize);
+                    }
+                    ljustStringBuilder.append(tailPrefix).append(charDuplicate(
+                        ljustTargetSize - ljustInputLength,
+                        params.size() == 3 ? getCharFromParam(params.get(2), ' ') : ' '
+                    )).append(tailSuffix);
+                    return ljustStringBuilder.toString();
+                }
+                case "rjust": {
+                    StringBuilder rjustStringBuilder = new StringBuilder(params.get(0).toString());
+                    if (params.size() == 1) {
+                        return rjustStringBuilder.toString();
+                    }
+                    int rjustInputLength = rjustStringBuilder.length();
+                    int rjustTargetSize = Integer.parseInt(params.get(1).toString());
+                    if (rjustInputLength >= rjustTargetSize) {
+                        return rjustStringBuilder.substring(0, rjustTargetSize);
+                    }
+                    rjustStringBuilder.insert(0, headSuffix).insert(0, charDuplicate(
+                        rjustTargetSize - rjustInputLength,
+                        params.size() == 3 ? getCharFromParam(params.get(2), ' ') : ' '
+                    )).insert(0, headPrefix);
+                    return rjustStringBuilder.toString();
+                }
+                case "count": {
+                    String countString = params.get(0).toString();
+                    String countTarget = params.get(1).toString();
+                    if(countTarget.length() == 0){
+                        return Integer.toString(countString.length() + 1);
+                    }
+                    int countValue = 0;
+                    for(int i=0; i<countString.length(); i++){
+                        if(countTarget.charAt(0) == countString.charAt(i)){
+                            boolean foundNotEqualChar = false;
+                            for(int j=0; j<countTarget.length(); j++){
+                                if (countString.charAt(i + j) != countTarget.charAt(j)) {
+                                    foundNotEqualChar = true;
+                                    break;
+                                }
+                            }
+                            if(!foundNotEqualChar){
+                                countValue++;
+                                i += countTarget.length()-1;
+                            }
+                        }
+                    }
+                    return Integer.toString(countValue);
+                }
             }
         }
         catch (Exception e){
@@ -397,6 +478,10 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
         defaults.put("boolean.output-parameter-format", true);
         defaults.put("boolean.format.true", "&aO");
         defaults.put("boolean.format.false", "&7x");
+        defaults.put("blank.head.prefix", "");
+        defaults.put("blank.head.suffix", "");
+        defaults.put("blank.tail.prefix", "");
+        defaults.put("blank.tail.suffix", "");
         return defaults;
     }
 }

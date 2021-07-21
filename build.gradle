@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "pub.silence"
-version = "0.0.1"
+version = "1.0.0"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
