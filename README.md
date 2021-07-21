@@ -1,4 +1,7 @@
 # 字符串拓展
+
+###### [English]() / 中文
+
 这是一个 [PlaceHolderAPI](http://placeholderapi.com/) 的拓展，提供了字符串修改支持。
 小如大小写转换，字符个数统计；大如字符串切割，格式化字符串都能胜任。
 
@@ -11,8 +14,6 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 
 > 大部分功能都参考了 String 类的设计，将传入的字符串解析后，
 > 转换为方法，以及调用这个方法所需要的参数。
-> 
-> 后续会用 Java 实现一些其他编程语言的字符串处理工具，如 Python 的首字母大写等。
 
 ## 调用方式
 
@@ -45,10 +46,7 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 > [22:01:32 INFO]: [PlaceholderAPI] [String] [Parse finished, continue.] > Silence114(BracketPlaceholders) > Silence114
 > [22:01:32 INFO]: silence114
 > ```
-
-
-
-
+  
 > 实例：获取玩家ID的首字母并将其大写（假设玩家名为 **`Silence114`**）
 > ```
 > %str_uppercase_{str_charat_{player_name},<0i>}%
@@ -88,17 +86,24 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 | double | \<number`d`\> | `<2d>`=2.0 `<2.4d>`=2.4 `<.9d>`=0.9 | 浮点数类型~~（可以简单的理解为有小数的类型，但实际上是**双**精度浮点型）~~，由尖括号`<>`包裹数字，并用`d`强调它是 double：浮点型。若这个数字有小数部分，会被向下取整。如玩家的位置等都是浮点型。 |
 | Number | \<number\> | `<2>`=2 `<2.4>`=2.4 `<2.9>`=2.9 | 数字型，他包含了整数类型和浮点数类型，尖括号`<>`包裹数字，会自动根据是否有小数点转为整型或浮点型。~~（实际上Java并不能实例化Number类型）~~ |
 | char | \<number`a`\> \<number`A`\> | `<37a>`=% `<37A>`=7 | 字符型，仅支持 ASCII 字符，number 表示字符在[ ASCII 码表]( https://tool.ip138.com/ascii_code/ )中的编码，小写的`a`表示这个编码是十进制的，大写的`A`表示这个编码是十六进制的。**注意：示例中的“7”表示的是`'7'`这个字符，而不是7这个数字。**|
-| boolean | \<`t`/`f`\> | `<t>`=true `<f>`=false | 布尔型，只有两种值，表示对与错，是与否，常用于表示判断结果。例如，“玩家在主世界”，当他在值就为true，不在值为false |
+| boolean | \<`t`/`f`\> | `<t>`=true `<f>`=false | 布尔型，只有两种值，表示对与错，是与否，常用于表示判断结果。例如，“玩家在主世界”，当他在值就为true，不在值为false。 |
 
-**注意：考虑到方法中输入 ASCII 码表示字符参数比较困难，所有字符参数都会自动将长度为1的字符串转换为字符。**（长度大于1则取首字符）
-由于一些格式字符已经被占用，下列字符需要转义，仅在确认无法转换成其他字符时才会还原转义，并将其是别为字符串。
+**注意：考虑到方法中输入 ASCII 码表示字符参数比较困难，所有字符类型的参数都可以传入长度为1的字符串，会自动转为字符。**（长度大于1则取首字符）  
+由于一些格式字符已经被占用，下列字符需要转义，仅在确认无法转换成其他类型时才会还原转义，并将其识别为字符串。
+
 | 字符 | 转义表达 | 占用原因 |
+| :----: | :----: | :---- |
 | `%` | `$` | PlaceHolder 标识符 |
 | `$` | `\$` | 转义 `%`，format 方法中会大量用到百分号。 |
 | `<` | `\<` | 类型转换识别 |
 | `>` | `\>` | 类型转换识别 |
 | `,` | `\,` | 参数间隔标识 |
 | `\` | `\\` | 转义标识 |
+
+由于大括号被用来标记内嵌占位符，而将大括号转义会在识别内嵌占位符时使得解析变得复杂，从而影响性能。
+但倘若您真的需要使用大括号，可以使用大括号调用本拓展的 `char` 方法，并传入它们的 ASCII 编码数字。  
+`{str_char_<123>}` -> `{`  
+`{str_char_<125>}` -> `}`
 
 ## 可用占位符与方法
 
@@ -200,15 +205,15 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 > ```
 
 ### Python部分字符串方法实现
-| 方法 | 占位符格式 | 参数类型 | 说明 | 简写 |
-| :----: | :---- | :---- | :---- | :----: |
-| capitalize | `%str_capitalize_alice%` | String | 首字母大写，若首字符不是小写字母则原样返回 | |
-| center | `%str_center_str,<10i>%` | String, int | 剧中，将 `str` 左右两端填充空格，直至长度为 `10` | |
-| center | `%str_center_str,<10i>,-%` | String, int, char | 剧中，将 `str` 左右两端填充 `-`，直至长度为 `10` | |
-| ljust | `%str_ljust_str,<10i>%` | String, int | 左对齐，将 `str` 右端填充空格，直至长度为 `10` | |
-| ljust | `%str_ljust_str,<10i>,-%` | String, int, char | 左对齐，将 `str` 右端填充 `-`，直至长度为 `10` | |
-| rjust | `%str_rjust_str,<10i>%` | String, int | 右对齐，将 `str` 左端填充空格，直至长度为 `10` | |
-| rjust | `%str_rjust_str,<10i>,-`% | String, int, char | 右对齐，将 `str` 左端填充 `-`，直至长度为 `10` | |
+| 方法 | 占位符格式 | 参数类型 | 说明 |
+| :----: | :---- | :---- | :---- |
+| capitalize | `%str_capitalize_alice%` | String | 首字母大写，若首字符不是小写字母则原样返回 |
+| center | `%str_center_str,<10i>%` | String, int | 剧中，将 `str` 左右两端填充空格，直至长度为 `10` |
+| center | `%str_center_str,<10i>,-%` | String, int, char | 剧中，将 `str` 左右两端填充 `-`，直至长度为 `10` |
+| ljust | `%str_ljust_str,<10i>%` | String, int | 左对齐，将 `str` 右端填充空格，直至长度为 `10` |
+| ljust | `%str_ljust_str,<10i>,-%` | String, int, char | 左对齐，将 `str` 右端填充 `-`，直至长度为 `10` |
+| rjust | `%str_rjust_str,<10i>%` | String, int | 右对齐，将 `str` 左端填充空格，直至长度为 `10` |
+| rjust | `%str_rjust_str,<10i>,-`% | String, int, char | 右对齐，将 `str` 左端填充 `-`，直至长度为 `10` |
 
 > `center`，`ljust` 和 `rjust` 可以很方便地制作整齐、漂亮的列表，如聊天区域的列表，记分板列表，甚至 Tab 列表。
 
@@ -231,20 +236,90 @@ Java 内部有个字符串类，该拓展的大部分功能都是将参数传递
 > ```
 
 ## 配置文件
+
 ```yaml
 expansions:
   str:
+    # 开启后会在解析时从控制台输出更多的信息以供调试使用。
     debug: false
     boolean:
+      # 定义布尔值的输出，可以用颜色字符。
       format:
         'true': '&aO'
         'false': '&7x'
+      # 开启后，所有输出布尔值的方法都会输出 <t> 或 <f> 以便将结果作为参数输入给其他方法。
+      # 若关闭，则将直接输出 format 中定义的格式。
+      # 但无论如何，boolean 方法都会按 format 中的定义输出。
       output-parameter-format: true
+    # 用于向 `center`，`ljust` 和 `rjust` 方法产生的空白添加前后缀。
     blank:
-      tail:
-        suffix: ''
-        prefix: ''
       head:
         suffix: ''
         prefix: ''
+      tail:
+        suffix: ''
+        prefix: ''
 ```
+
+### 空白
+
+部分版本的 Minecraft 客户端的空格宽度和其他字母的宽度不一致，导致表格排版混乱，因此可以用 `-`、`_`、`◼️️` 等字符，并将他们颜色设置为黑色 `&0` 、灰色 `&7` 或者深灰色 `&8` 使他们不那么容易被看出来，还能占一个字母的宽度。  其他颜色可用参考 [Minecraft Wiki - 格式化代码]( https://minecraft.fandom.com/zh/wiki/%E6%A0%BC%E5%BC%8F%E5%8C%96%E4%BB%A3%E7%A0%81 )
+通过 `%str_center_abc,<10i>,-%`、`%str_ljust_abc,<10i>,-%` 和 `%str_rjust_abc,<10i>,-%` 展示这三个方法的运作原理，并介绍 `head` 和 `tail` 的位置。  
+首先通过 `/papi parse` 命令查看执行结果如何：
+```
+> papi parse Silence114 %str_center_abc,<10i>,-%
+[19:48:22 INFO]: ---abc----
+> papi parse Silence114 %str_ljust_abc,<10i>,-%
+[19:48:40 INFO]: abc-------
+> papi parse Silence114 %str_rjust_abc,<10i>,-%
+[19:48:45 INFO]: -------abc
+```
+#### center
+```
+        head  头   
+        |       tail 尾
+        |       |
+      [---]abc[----]
+      ^   ^   ^    ^
+      |   |   |    tail suffix 尾后缀
+      |   |   tail prefix 尾前缀
+      |   |
+      |   head suffix 头后缀
+      head prefix 头前缀
+```
+**中括号是用来标识位置，实际上本例中并不存在，下同。**
+#### ljust
+```
+             tail 尾
+             |
+      abc[-------]
+         ^       ^
+         |       tail suffix 尾后缀
+         tail prefix 尾前缀
+```
+#### rjust
+```
+          head 头
+          |
+      [-------]abc
+      ^       ^
+      |       tail suffix 尾后缀
+      tail prefix 尾前缀
+```
+
+因前后缀的长度并不会导致一列的数据参差不齐，而且添加前后缀的动机就是为了能通过颜色代码改变头尾空白的颜色，所以头尾前后缀不会计入总字符串长度。  
+例如，还是上面那个 `%str_center_abc,<10i>,-%`，如果我们在配置文件中这样设置：
+```yaml
+blank:
+  head:
+    suffix: '&0'
+    prefix: '&f'
+  tail:
+    suffix: '&0'
+    prefix: '&f'
+```
+那它的执行结果为
+```
+&0---&fabc&0----&f
+```
+`ljust` 和 `rjust` 也是同理。
