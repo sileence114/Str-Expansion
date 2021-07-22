@@ -287,7 +287,7 @@ expansions:
       |   head suffix 头后缀
       head prefix 头前缀
 ```
-**中括号是用来标识位置，实际上本例中并不存在，下同。**
+**中括号是用来标识位置，实际上本例的结果中并不存在，下同。**
 #### ljust
 ```
              tail 尾
@@ -326,3 +326,73 @@ blank:
 
 ## 实战：完善服务器的 Tab 列表
 
+* 服务端：[Mohist]( https://mohistmc.com/ ) 1.16.5-727
+* 插件：
+  * [TabListPro]( https://www.spigotmc.org/resources/%E2%98%85-tablistpro-%E2%98%85-name-animations-sorting-header-footer-easy-setup-1-8-1-16.21532/ ) 1.2.2
+  * [PlaceholderAPI]( https://www.spigotmc.org/resources/placeholderapi.6245/ ) 2.10.9
+  * [spark]( https://www.spigotmc.org/resources/spark.57242/ ) 1.6.1
+* 拓展：
+  * str
+  * math (`/papi ecloud download math`)
+  * spark
+  * player (`/papi ecloud download player`)
+  * server (`/papi ecloud download server`)
+
+
+> 演示所用的 Mohist 版本可能有问题，导致使用 `%server_tps_1_colored%` 获取的 TPS 不是很准确，
+> 因此使用 spark-Bukkit 提供的 `%spark_tps_5s`
+
+* 目标：
+  * 在列表的头部显示：
+    1. CPU 占用（百分比）
+    2. 内存占用（已用、总计、百分比）
+    3. TPS
+    4. 时间
+  * 在玩家列表内显示：
+    1. 名字
+    2. 网络延迟
+    3. 生命值
+    4. 等级
+    5. 世界及位置
+      * 世界名称
+      * x
+      * y
+      * z
+
+通过查询 PlaceholderAPI Wiki： [Placeholders]( https://github.com/PlaceholderAPI/PlaceholderAPI/wiki/Placeholders )，可用通过以下变量获取我们想要的信息
+
+| Placeholder | 返回数据 |
+| ---- | ---- |
+| %spark_cpu_system_10s% | 10 秒内 CPU占 用的平均值 |
+| %server_ram_used% | 已用内存 |
+| %server_ram_max% | 内存最大可用 |
+| %spark_tps_5s% | 5 秒内 TPS 平均值 |
+| %server_time_yyyy/MM/dd hh:mm:ss% | 服务器时间格式化，`年/月/日 时:分:秒` |
+
+| Placeholder | 返回数据 |
+| ---- | ---- |
+| %player_name% | 玩家名字 |
+| %player_ping% | 玩家延迟 |
+| %player_health_rounded% | 玩家生命值四舍五入取整 |
+| %player_max_health_rounded% | 玩家最大生命值四舍五入取整 |
+| %player_level% | 玩家等级 |
+| %player_world% | 所处世界 |
+| %player_x% | 玩家位置x |
+| %player_y% | 玩家位置y |
+| %player_z% | 玩家位置z |
+
+我们还需要计算内存占用的百分比，可以通过下面的方法计算：
+$$\frac{server\_ram\_used}{server\_ram\_max}×100\%$$
+上述表达式写成 `math` 能接受的形式，`%math_0_100*{server_ram_used}/{server_ram_max}%`，这个结果是没有单位的，需要自行添加单位：`%`，但由于 `%` 被 PlaceholderAPI 占用，所以使用 `char` 方法返回 `%`，`%str_char_<37>%`。
+
+所以完整的内存占用百分比表示为：`%math_0_100*{server_ram_used}/{server_ram_max}%%str_char_<37>%`。假设内存已用 1024M、总计 2048M，下图解释了它的运行逻辑。
+
+```
+              ____1024_____     ____2048____
+             /             \   /            \
+%math_0_100*{server_ram_used}/{server_ram_max}%%str_char_<37>%
+ \____________________  ____________________/   \_____ _____/
+                      50                              %
+                       \_____________   _____________/
+                                     50%
+```
