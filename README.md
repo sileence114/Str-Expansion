@@ -1,6 +1,6 @@
 # 字符串扩展
 
-###### [English]( #string-expansion ) / 中文
+###### [English](#string-expansion) / 中文
 
 这是一个 [PlaceHolderAPI](http://placeholderapi.com/) 的扩展，提供了字符串修改支持。
 小如大小写转换、数字符个数，大如字符串切割等都能很好的支持。
@@ -410,7 +410,7 @@ $$\frac{server\_ram\_used}{server\_ram\_max}×100\%$$
 > Time %server_time_yyyy/MM/dd hh:mm:ss%
 > ```
 > 通过 `/papi parse` 执行
-> [!无样式列表头]( https://github.com/sileence114/String-Expansion/blob/master/document/head-parse-1.png )
+> ![无样式列表头]( https://github.com/sileence114/String-Expansion/blob/master/document/head-parse-1.png )
 
 添加一点格式化代码、特殊符号作为装饰  
 `&6CPU&e%spark_cpu_system_10s% &f| &6Mem&e%math_1_100*{server_ram_used}/{server_ram_max}%%ascii_37%&7(&e%server_ram_used%&7/&e%server_ram_max%&6MB&7) &f| &6TPS%spark_tps_5s%&r\n&6Time: &e%server_time_yyyy/MM/dd hh:mm:ss% &6UTC+8&r`  
@@ -425,7 +425,7 @@ $$\frac{server\_ram\_used}{server\_ram\_max}×100\%$$
 > &6Time: &e%server_time_yyyy/MM/dd hh:mm:ss% &6UTC+8&r
 > ```
 > 通过 `/papi parse` 执行
-> [!有样式列表头]( https://github.com/sileence114/String-Expansion/blob/master/document/head-parse-1.png )
+> ![有样式列表头]( https://github.com/sileence114/String-Expansion/blob/master/document/head-parse-1.png )
 
 ### 列表中的玩家行
 
@@ -466,10 +466,10 @@ $$\frac{server\_ram\_used}{server\_ram\_max}×100\%$$
 > &7(%str_rjust_&e{player_x},<7i>,_%&7,%str_rjust_&e{player_y},<5i>,_%&7,%str_rjust_&e{player_z},<7i>,_%&7)&r
 > ```
 > 在控制台通过 `/papi parse` 执行多次
-> [!控制台执行]( https://github.com/sileence114/String-Expansion/blob/master/document/body-parse-console.png )
+> ![控制台执行]( https://github.com/sileence114/String-Expansion/blob/master/document/body-parse-console.png )
 
 至此已经完成准备工作，只需要修改配置文件并重载即可 `/tablistpro reload`，效果图：
-[!效果图]( https://github.com/sileence114/String-Expansion/blob/master/document/tab-list.png )
+![效果图]( https://github.com/sileence114/String-Expansion/blob/master/document/tab-list.png )
 
 > 备注：
 > * MineCraft自带的字体中每个字母并不等宽，显示效果可能并不好，可以尝试将“**语言**”中的“**强制使用Unicode字体**”，关闭，或通过资源包加载一个等宽字体；
@@ -517,7 +517,7 @@ no-permission: '&8[&b&lTabList&9&lPro&8] &bYou do not have permission to do that
 
 # String Expansion
 
-###### English / [中文]( #字符串扩展 )
+###### English / [中文](#字符串扩展)
 
 This is an extension of [PlaceHolderAPI](http://placeholderapi.com/) that provides string modification support.
 The case conversion, counting the number of characters, or string cutting, etc. can be well supported. 
@@ -926,7 +926,7 @@ $$\frac{server\_ram\_used}{server\_ram\_max}×100\%$$
 > Time %server_time_yyyy/MM/dd hh:mm:ss%
 > ```
 > 通过 `/papi parse` 执行
-> [!无样式列表头]( https://github.com/sileence114/String-Expansion/blob/master/document/head-parse-1.png )
+> ![无样式列表头]( https://github.com/sileence114/String-Expansion/blob/master/document/head-parse-1.png )
 
 添加一点格式化代码、特殊符号作为装饰  
 `&6CPU&e%spark_cpu_system_10s% &f| &6Mem&e%math_1_100*{server_ram_used}/{server_ram_max}%%ascii_37%&7(&e%server_ram_used%&7/&e%server_ram_max%&6MB&7) &f| &6TPS%spark_tps_5s%&r\n&6Time: &e%server_time_yyyy/MM/dd hh:mm:ss% &6UTC+8&r`  
@@ -941,7 +941,7 @@ $$\frac{server\_ram\_used}{server\_ram\_max}×100\%$$
 > &6Time: &e%server_time_yyyy/MM/dd hh:mm:ss% &6UTC+8&r
 > ```
 > 通过 `/papi parse` 执行
-> [!有样式列表头]( https://github.com/sileence114/String-Expansion/blob/master/document/head-parse-1.png )
+> ![有样式列表头]( https://github.com/sileence114/String-Expansion/blob/master/document/head-parse-1.png )
 
 ### Player line
 
@@ -982,10 +982,10 @@ $$\frac{server\_ram\_used}{server\_ram\_max}×100\%$$
 > &7(%str_rjust_&e{player_x},<7i>,_%&7,%str_rjust_&e{player_y},<5i>,_%&7,%str_rjust_&e{player_z},<7i>,_%&7)&r
 > ```
 > Use `/papi parse` on console.
-> [!Console Parse]( https://github.com/sileence114/String-Expansion/blob/master/document/body-parse-console.png )
+> ![Console Parse]( https://github.com/sileence114/String-Expansion/blob/master/document/body-parse-console.png )
 
 So far, the preparations have been completed. You only need to modify the configuration file and reload it with `/tablistpro reload`. The tabList screenshot: 
-[!TabList Screenshot]( https://github.com/sileence114/String-Expansion/blob/master/document/tab-list.png )
+![TabList Screenshot]( https://github.com/sileence114/String-Expansion/blob/master/document/tab-list.png )
 
 > Note：
 > * Letter of MineCraft’s build-in fonts is not equal in width, so the display effect may not be good. You can try to turn off "**Force Unicode Font**" in "**Language**", or load a monospace font through the resource pack.
