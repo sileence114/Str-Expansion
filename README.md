@@ -276,7 +276,7 @@ expansions:
 ```
 #### center
 ```
-        head  头   
+        head  头
         |       tail 尾
         |       |
       [---]abc[----]
@@ -307,7 +307,9 @@ expansions:
       tail prefix 尾前缀
 ```
 
-因前后缀的长度并不会导致一列的数据参差不齐，而且添加前后缀的动机就是为了能通过颜色代码改变头尾空白的颜色，所以头尾前后缀不会计入总字符串长度。  
+#### 前后缀
+
+添加前后缀的本意是为了能通过颜色代码改变头尾空白的颜色，所以头尾前后缀不会计入总字符串长度。  
 例如，还是上面那个 `%str_center_abc,<10i>,-%`，如果我们在配置文件中这样设置：
 ```yaml
 blank:
@@ -395,4 +397,108 @@ $$\frac{server\_ram\_used}{server\_ram\_max}×100\%$$
                       50                              %
                        \_____________   _____________/
                                      50%
+```
+
+### 列表头部
+
+因此我们可以很方便的写出列表头部需要显示的内容  
+`CPU %spark_cpu_system_10s% Mem %math_1_100*{server_ram_used}/{server_ram_max}%%ascii_37%(%server_ram_used%/%server_ram_max%MB) TPS %spark_tps_5s% Time %server_time_yyyy/MM/dd hh:mm:ss%`  
+
+> 为了阅读方便适当换行的版本：
+> ```
+> CPU %spark_cpu_system_10s%
+> Mem %math_1_100*{server_ram_used}/{server_ram_max}%%ascii_37%(%server_ram_used%/%server_ram_max%MB)
+> TPS %spark_tps_5s%
+> Time %server_time_yyyy/MM/dd hh:mm:ss%
+> ```
+> 通过 `/papi parse` 执行
+> `head-parse-1.jpg`
+
+添加一点格式化代码、特殊符号作为装饰  
+`&6CPU&e%spark_cpu_system_10s% &f| &6Mem&e%math_1_100*{server_ram_used}/{server_ram_max}%%ascii_37%&7(&e%server_ram_used%&7/&e%server_ram_max%&6MB&7) &f| &6TPS%spark_tps_5s%&r\n&6Time: &e%server_time_yyyy/MM/dd hh:mm:ss% &6UTC+8&r`  
+
+> 为了阅读方便适当换行的版本：
+> ```
+> （第一行）
+> &6CPU&e%spark_cpu_system_10s% &f| 
+> &6Mem&e%math_1_100*{server_ram_used}/{server_ram_max}%%ascii_37%&7(&e%server_ram_used%&7/&e%server_ram_max%&6MB&7) &f| 
+> &6TPS%spark_tps_5s%&r\n
+> （第二行）
+> &6Time: &e%server_time_yyyy/MM/dd hh:mm:ss% &6UTC+8&r
+> ```
+> 通过 `/papi parse` 执行
+> `head-parse-2.jpg`
+
+### 玩家列表
+
+写出玩家列表每行要显示的内容  
+`%player_name% &e%player_ping%&7ms &e%player_health_rounded%&7/&e%player_max_health_rounded%&c♥ &7lev.&e%player_level% &e%player_world%&7(&e%player_x%&7,&e%player_y%&7,&e%player_z%&7)&r`
+
+> 为了阅读方便适当换行的版本：
+> ```
+> %player_name%
+> &e%player_ping%&7ms
+> &e%player_health_rounded%&7/&e%player_max_health_rounded%&c♥
+> &7lev.&e%player_level%
+> &e%player_world%&7(&e%player_x%&7,&e%player_y%&7,&e%player_z%&7)&r
+> ```
+
+若想让玩家列表像个表格一样井井有条，每一列都需要指定的输出长度，用黑色的下划线占位（`_`）。
+| 列 | 指定长度 | 对齐方式 | 对齐后占位符 |
+| ---- | ---- | ---- | ---- |
+| %player_name% | 玩家 ID，最长为 16 | 左对齐 | %str_ljust_{player_name},<16i>,_% |
+| %player_ping% | 玩家延迟，最长为 4，延迟 >9999ms 的玩家会很快离开服务器 | 右对齐 | %str_rjust_{player_ping},<4i>,_% |
+| %player_health_rounded% | 玩家当前生命值，最长为 2，若玩家最大生命值 >99 请服主自行修改 | 右对齐 | %str_rjust_{player_health_rounded},<2i>,_% |
+| %player_max_health_rounded% | 玩家最大生命值，最长为 2，若玩家最大生命值 >99 请服主自行修改 | 左对齐 | %str_ljust_{player_max_health_rounded},<2i>,_% |
+| %player_level% | 玩家等级，最长为 4，就算通过僵尸猪灵刷怪塔，三五百级也顶了天了，根据MineCraft Wiki，生存模式理论最高等级为 `238,609,312`，供参考 | 右对齐 | %str_rjust_{player_level},<4i>,_% |
+| %player_world% | 玩家所处的世界，最大长度设置为玩家能到达的世界中，世界名的长度的最大值，本例中最长的世界名为 `twilightforest` 即 14 | 右对齐 | %str_rjust_{player_world},<14i>,_% |
+| %player_x% | 玩家位置 x，服务器开放了半径 5000，算上负号，最长为 5 | 右对齐 | %str_rjust_{player_x},<5i>,_% |
+| %player_y% | 玩家位置 y，最大 255，最长为 3 | 右对齐 | %str_rjust_{player_y},<3i>,_% |
+| %player_z% | 玩家位置 x，服务器开放了半径 5000，算上负号，最长为 5 | 右对齐 | %str_rjust_{player_z},<5i>,_% |
+在此之上添加颜色代码、特殊符号作为装饰，因为前缀的格式化字符会重置颜色，因此要将颜色代码也添加到参数前面，长度也需要 +2  
+`%str_ljust_{player_name},<16i>,_% &f| %str_rjust_&e{player_ping},<6i>,_%&7ms &f| %str_rjust_&e{player_health_rounded},<4i>,_%&7/%str_ljust_&e{player_max_health_rounded},<4i>,_%&c♥ &f| &7lev.%str_rjust_&e{player_level},<6i>,_% &f| %str_rjust_&e{player_world},<16i>,_%&7(%str_rjust_&e{player_x},<7i>,_%&7,%str_rjust_&e{player_y},<5i>,_%&7,%str_rjust_&e{player_z},<7i>,_%&7)&r`
+
+> 为了阅读方便适当换行的版本：
+> ```
+> %str_ljust_{player_name},<16i>,_% &f|
+> %str_rjust_&e{player_ping},<6i>,_%&7ms &f|
+> %str_rjust_&e{player_health_rounded},<4i>,_%&7/%str_ljust_&e{player_max_health_rounded},<4i>,_%&c♥ &f|
+> &7lev.%str_rjust_&e{player_level},<6i>,_% &f|
+> %str_rjust_&e{player_world},<16i>,_%
+> &7(%str_rjust_&e{player_x},<7i>,_%&7,%str_rjust_&e{player_y},<5i>,_%&7,%str_rjust_&e{player_z},<7i>,_%&7)&r
+> ```
+> 在控制台通过 `/papi parse` 执行多次
+> `body-parse-console.jpg`
+
+至此已经完成准备工作，只需要修改配置文件并重载即可 `/tablistpro reload`，效果图：
+`tab-list.png`
+
+
+### 配置文件参考
+
+```yaml
+header-enabled: true
+header:
+  - '&6CPU&e%spark_cpu_system_10s% &f| &6Mem&e%math_1_100*{server_ram_used}/{server_ram_max}%%ascii_37%&7(&e%server_ram_used%&7/&e%server_ram_max%&6MB&7) &f| &6TPS%spark_tps_5s%&r\n&6Time: &e%server_time_yyyy/MM/dd hh:mm:ss% &6UTC+8&r'
+header-interval: 20
+footer-enabled: false
+footer:
+footer-interval: 20
+sortByPerms: []
+update-sorting-and-groups: 300
+use-displayname: false
+prefix: '&8[&bCLAN&8] &f'
+suffix: '&f | &7&lNOVICE'
+default-group: 'player'
+groups:
+  player:
+    orHasPermission: 'player.nomal'
+    display:
+      - '%str_ljust_{player_name},<16i>,_% &f| %str_rjust_&e{player_ping},<6i>,_%&7ms &f| %str_rjust_&e{player_health_rounded},<4i>,_%&7/%str_ljust_&e{player_max_health_rounded},<4i>,_%&c♥ &f| &7lev.%str_rjust_&e{player_level},<6i>,_% &f| %str_rjust_&e{player_world},<16i>,_%&7(%str_rjust_&e{player_x},<7i>,_%&7,%str_rjust_&e{player_y},<5i>,_%&7,%str_rjust_&e{player_z},<7i>,_%&7)&r'
+  op:
+    orHasPermission: 'op.disable'
+    display:
+      - '%str_ljust_{player_name},<16i>,_% &f| %str_rjust_&e{player_ping},<6i>,_%&7ms &f| %str_rjust_&e{player_health_rounded},<4i>,_%&7/%str_ljust_&e{player_max_health_rounded},<4i>,_%&c♥ &f| &7lev.%str_rjust_&e{player_level},<6i>,_% &f| %str_rjust_&e{player_world},<16i>,_%&7(%str_rjust_&e{player_x},<7i>,_%&7,%str_rjust_&e{player_y},<5i>,_%&7,%str_rjust_&e{player_z},<7i>,_%&7)&r'
+name-animation: 10
+no-permission: '&8[&b&lTabList&9&lPro&8] &bYou do not have permission to do that!'
 ```
