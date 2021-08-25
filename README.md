@@ -622,7 +622,7 @@ Because some format characters are already occupied, the following characters ne
 | `\` | `\\` | Escape flag. |
 
 Because braces are used to mark embedded placeholders, escaping the braces will complicate the parsing when recognizing embedded placeholders, thereby affecting performance.
-But if you really need to use braces, you can use the braces to call the extended `char` function and pass in their ASCII code numbers.
+But if you really need to use braces, you can use the braces to call the extended `char` function and pass in their ASCII code numbers.  
 `{str_char_<123>}` -> `{`  
 `{str_char_<125>}` -> `}`
 
@@ -810,7 +810,7 @@ First use the `/papi parse` command to view the execution result:
       |   head suffix
       head prefix
 ```
-**The brackets are used to identify the position, in fact, it does not exist in the result of this example, the same below. **
+**The brackets are used to identify the position, in fact, it does not exist in the result of this example, the same below.**
 #### ljust
 ```
              tail
@@ -937,7 +937,7 @@ In summary, write out the content that needs to be displayed at the head of the 
 > Execute by `/papi parse`. 
 > ![无样式列表头]( https://github.com/sileence114/String-Expansion/blob/master/document/head-parse-1.png )
 
-Add a little formatting code and special symbols as decoration.
+Add a little formatting code and special symbols as decoration.  
 `&6CPU&e%spark_cpu_system_10s% &f| &6Mem&e%math_1_100*{server_ram_used}/{server_ram_max}%%ascii_37%&7(&e%server_ram_used%&7/&e%server_ram_max%&6MB&7) &f| &6TPS%spark_tps_5s%&r\n&6Time: &e%server_time_yyyy/MM/dd hh:mm:ss% &6UTC+8&r`  
 
 > A version with appropriate line breaks for the convenience of reading: 
@@ -981,7 +981,6 @@ If you want the player list to be organized like a table, each column needs to s
 | %player_z% | Player position y, the server opens a radius of 5000, plus the minus sign, the longest is 5. | Align right. | %str_rjust_{player_z},<5i>,_% |
 
 Add color codes and special symbols as decorations on top of this, because the formatting characters of the prefix will reset the color, so the color code should also be added to the front of the parameter, and the length needs to be increased by 2.  
-
 `%str_ljust_{player_name},<16i>,_% &f| %str_rjust_&e{player_ping},<6i>,_%&7ms &f| %str_rjust_&e{player_health_rounded},<4i>,_%&7/%str_ljust_&e{player_max_health_rounded},<4i>,_%&c♥ &f| &7lev.%str_rjust_&e{player_level},<6i>,_% &f| %str_rjust_&e{player_world},<16i>,_%&7(%str_rjust_&e{player_x},<7i>,_%&7,%str_rjust_&e{player_y},<5i>,_%&7,%str_rjust_&e{player_z},<7i>,_%&7)&r`
 
 > A version with appropriate line breaks for the convenience of reading: 
