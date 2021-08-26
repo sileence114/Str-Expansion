@@ -1,6 +1,6 @@
 # 字符串扩展
 
-###### [English]( https://github.com/sileence114/Str-Expansion/edit/master/README.md ) / 中文
+###### [English]( https://github.com/sileence114/Str-Expansion/blob/master/README.md ) / 中文
 
 这是一个 [PlaceHolderAPI](http://placeholderapi.com/) 的扩展，提供了字符串修改支持。
 小如大小写转换、数字符个数，大如字符串切割等都能很好的支持。
