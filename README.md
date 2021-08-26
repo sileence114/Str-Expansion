@@ -1,6 +1,6 @@
 # String Expansion
 
-###### English / [中文]( https://github.com/sileence114/Str-Expansion/edit/master/README_cn.md )
+###### English / [中文]( https://github.com/sileence114/Str-Expansion/blob/master/README_cn.md )
 
 This is an extension of [PlaceHolderAPI](http://placeholderapi.com/) that provides string modification support.
 The case conversion, counting the number of characters, or string cutting, etc. can be well supported. 
