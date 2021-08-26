@@ -1,15 +1,11 @@
 package pub.silence.papi.expansion;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -218,10 +214,10 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
             return str;
         }
     }
-    protected static char getCharFromParam(Object p, char defaults){
-        char v = defaults;
+    protected static char getCharFromParam(Object p){
+        char v = ' ';
         if(p instanceof String){
-            v = (p.toString().length() == 0) ? defaults : p.toString().charAt(0);
+            v = (p.toString().length() == 0) ? ' ' : p.toString().charAt(0);
         }
         else if(p instanceof Character){
             v = (char)p;
@@ -237,7 +233,7 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
     
     protected static BiFunction<OfflinePlayer, String, Object> handleParamFunc = StrExpansion::handleParam;
     protected static String trueBoolean = "&aO";
-    protected static String falseBoolean = "&7x";
+    protected static String falseBoolean = "&7X";
     protected static String booleanToStringTrue = "<t>";
     protected static String booleanToStringFalse = "<f>";
     protected static String headPrefix = "";
@@ -250,7 +246,7 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                           StrExpansion::handleParamDebugged :
                           StrExpansion::handleParam;
         trueBoolean = getString("boolean.format.true", "&aO");
-        falseBoolean = getString("boolean.format.false", "&7x");
+        falseBoolean = getString("boolean.format.false", "&7X");
         headPrefix = getString("blank.head.prefix", "");
         headSuffix = getString("blank.head.suffix", "");
         tailPrefix = getString("blank.tail.prefix", "");
@@ -392,7 +388,7 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                     if (centerInputLength >= centerTargetSize) {
                         return centerStringBuilder.substring(0, centerTargetSize);
                     }
-                    char centerBlankChar = params.size() == 3 ? getCharFromParam(params.get(2), ' ') : ' ';
+                    char centerBlankChar = params.size() == 3 ? getCharFromParam(params.get(2)) : ' ';
                     centerStringBuilder.insert(0, headSuffix)
                                        .insert(0, charDuplicate((centerTargetSize - centerInputLength) / 2, centerBlankChar))
                                        .insert(0, headPrefix)
@@ -415,7 +411,7 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                     }
                     ljustStringBuilder.append(tailPrefix).append(charDuplicate(
                         ljustTargetSize - ljustInputLength,
-                        params.size() == 3 ? getCharFromParam(params.get(2), ' ') : ' '
+                        params.size() == 3 ? getCharFromParam(params.get(2)) : ' '
                     )).append(tailSuffix);
                     return ljustStringBuilder.toString();
                 }
@@ -431,7 +427,7 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
                     }
                     rjustStringBuilder.insert(0, headSuffix).insert(0, charDuplicate(
                         rjustTargetSize - rjustInputLength,
-                        params.size() == 3 ? getCharFromParam(params.get(2), ' ') : ' '
+                        params.size() == 3 ? getCharFromParam(params.get(2)) : ' '
                     )).insert(0, headPrefix);
                     return rjustStringBuilder.toString();
                 }
@@ -477,7 +473,7 @@ public class StrExpansion extends PlaceholderExpansion implements Configurable {
         defaults.put("debug", false);
         defaults.put("boolean.output-parameter-format", true);
         defaults.put("boolean.format.true", "&aO");
-        defaults.put("boolean.format.false", "&7x");
+        defaults.put("boolean.format.false", "&7X");
         defaults.put("blank.head.prefix", "");
         defaults.put("blank.head.suffix", "");
         defaults.put("blank.tail.prefix", "");
