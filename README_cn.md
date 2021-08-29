@@ -121,7 +121,7 @@ Java 内部有个字符串类，该扩展的大部分功能都是将参数传递
 | startswith | `%str_startswith_prefixStr,prefix,<3i>%`<br>`%str_startswith_prefixStr,fix,<3i>%` | String, String, int | 从第 `3` 个字符开始，判断后面的半段 `prefixStr` 是否以 `prefix` 开头。 | start |
 | endswith | `%str_endswith_strSuffix,Suffix%` | String, String | 判断 `strSuffix` 是否以 `Suffix` 结尾。 | ends |
 | endswith | `%str_endswith_strSuffix,Suffix,<3i>%` | String, String, int | 从第 `3` 个字符开始，判断前面的半段 `strSuffix` 是否以 `Suffix` 结尾。 | ends |
-| replace | `%str_replace_minecraft_mine_our%` | String, String, String | 将 `minecraft` 中所有 `mine` 替换为 `our`，**区分大小写。** | |
+| replace | `%str_replace_minecraft,mine,our%` | String, String, String | 将 `minecraft` 中所有 `mine` 替换为 `our`，**区分大小写。** | |
 | substring | `%str_substring_string,<3i>%` | String, int | 返回 `string` 从 `3` 到结尾的部分。 | sub |
 | substring | `%str_substring_string,<2i>,<4i>%` | String, int, int | 返回 `string` 从 `2` 到 `4` 的部分。注意，包含左端点，不包含右端点，左闭右开。 | sub |
 | format | `%str_format_template_,args1,args2,...%`<br>`%str_format_TPS:$.2f,<{server_tps_1}d>%` | String, Object... | 格式化字符串，使用 `arg1`，`arg2` 等参数填入 `template` 模板。这是一个高级方法，需要您了解 [C 语言]( https://www.cplusplus.com/reference/cstdio/printf/ )或 [Java]( http://www.java2s.com/Tutorials/Java/Java_Format/0050__Java_Printf_Style_Overview.htm ) 中关于格式化字符串相关的知识。<br>**使用** `$` **代替模板中的** `%` | fmt |
